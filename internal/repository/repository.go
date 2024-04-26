@@ -5,7 +5,7 @@ import (
 	"context"
 )
 
-type User interface {
+type UserRepo interface {
 	Create(ctx context.Context, user entities.UserCreate) (int, error)
 	Get(ctx context.Context, userID int) (*entities.User, error)
 	GetPassword(ctx context.Context, login string) (int, string, error)

@@ -5,14 +5,13 @@ import (
 	"GO_xp/internal/repository"
 	"context"
 	"github.com/jmoiron/sqlx"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type UserRepo struct {
 	db *sqlx.DB
 }
 
-func InitUserRepo(db *sqlx.DB) repository.User {
+func InitUserRepo(db *sqlx.DB) repository.UserRepo {
 	return UserRepo{
 		db: db,
 	}
@@ -20,14 +19,15 @@ func InitUserRepo(db *sqlx.DB) repository.User {
 
 func (usr UserRepo) Create(ctx context.Context, user entities.UserCreate) (int, error) {
 	var userID int
+
 	transaction, err := usr.db.BeginTx(ctx, nil)
 	if err != nil {
 		return 0, err
 	}
 
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
+	//hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 10) пароли хешируются в сервисном слое
 	row := transaction.QueryRowContext(ctx, `INSERT INTO users (login, username, hashed_password) VALUES ($1, $2, $3) RETURNING id;`,
-		user.Login, user.Name, hashedPassword)
+		user.Login, user.Name, user.Password)
 
 	err = row.Scan(&userID)
 	if err != nil {
@@ -76,8 +76,8 @@ func (usr UserRepo) UpdatePassword(ctx context.Context, userID int, newPassword 
 		return err
 	}
 
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(newPassword), 10)
-	result, err := transaction.ExecContext(ctx, `UPDATE users SET hashed_password = $2 WHERE users.id = $1;`, userID, hashedPassword)
+	//hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(newPassword), 10)
+	result, err := transaction.ExecContext(ctx, `UPDATE users SET hashed_password = $2 WHERE users.id = $1;`, userID, newPassword)
 	if err != nil {
 		return err
 	}
