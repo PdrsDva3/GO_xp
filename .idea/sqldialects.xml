@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SqlDialectMappings">
+    <file url="file://$PROJECT_DIR$/internal/migrations/20240425151355_add_users_table.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/internal/repository/user/user.go" dialect="PostgreSQL" />
+  </component>
+</project>
